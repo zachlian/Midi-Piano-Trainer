@@ -31,7 +31,7 @@ class Sampler:
                 octave += 1
         self.sounds = {}
         for id, name in self.id_to_file.items():
-            self.sounds[id] = mix.Sound("audio/samples/" + name)
+            self.sounds[id] = mix.Sound("audio/" + name)
 
     def play(self, note_id: int, vel: int) -> None:
         """
