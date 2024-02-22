@@ -13,10 +13,12 @@ mid.tracks.append(track)
 
 sampler: Sampler = None
 
+
+
 def note_handler(note: mido.Message) -> None:
     if note.type in ["note_on", "note_off"]:
         print(note.type, ', ', note.note, ', ', note.velocity, ', ', note.time)
-        note_id = int(note.note) if note.note is not None else -1
+        note_id = int(note.note)
         if note.type == "note_on":
             sampler.play(note_id, note.velocity)
             visualizer.press_key(note_id, note.velocity)
