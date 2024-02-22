@@ -3,6 +3,7 @@ import tkinter as tk
 from mido import MidiFile, MidiTrack
 import mido
 import time
+from recorder import Recorder
 START_W = 100
 START_H = 400
 RADIUS = 20
@@ -21,9 +22,7 @@ class PianoVisualizer:
         self.canvas.pack()
         self.keys = [None]*36 + [self.canvas.create_oval(START_W+i*RADIUS, START_H, START_W+i*RADIUS+RADIUS,
                                                           START_H+RADIUS, fill = ORIGIN_COLOR) for i in range(KEY_NUM)]
-        self.recording = False
-        self.mid = None
-        self.track = None
+        self.recorder = Recorder()
         self.add_record_button()
         self.time = 0
     def add_record_button(self):
@@ -44,51 +43,30 @@ class PianoVisualizer:
         self.discard_button.destroy()
         
     def record(self):
-        print('Start recording')
-        self.recording = True
-        self.mid = MidiFile(ticks_per_beat=1)
-        self.track = MidiTrack()
-        self.mid.tracks.append(self.track)
+        self.recorder.record()
         self.record_button.destroy()
         self.add_buttons()
-        self.time = time.time()
         
     def save(self):
-        self.recording = False
-        self.mid.save('new_song.mid')
-        self.mid = None
-        self.track = None
+        self.recorder.save()
         self.destroy_buttons()
         self.add_record_button()
         
     def re_record(self):
         print('Stop recording')
-        print('Start recording again')
-        self.track = MidiTrack()
-        self.mid.tracks.append(self.track)
+        self.recorder.record()
         
     def discard(self):
         print('Stop recording')
-        self.recording = False
-        self.mid = None
-        self.track = None
         self.destroy_buttons()
         self.add_record_button()
         
     def press_key(self, key_id, velocity):
         self.canvas.itemconfig(self.keys[key_id], fill = PRESSED_COLOR)
         self.canvas.move(self.keys[key_id], 0, -velocity * JUMP_RATE)
-        if self.recording:
-            
-            self.track.append(mido.Message('note_on', note=key_id, velocity=velocity, time=(time.time()-self.time)*1000))
-            print(key_id, velocity)
-            print(self.track)
-            
-        else:
-            print(self.track)
+        self.recorder.add_note(key_id, velocity, True)
+        
     def release_key(self, key_id):
         self.canvas.move(self.keys[key_id], 0, START_H - self.canvas.coords(self.keys[key_id])[1])
         self.canvas.itemconfig(self.keys[key_id], fill = ORIGIN_COLOR)
-        if self.recording:
-            self.track.append(mido.Message('note_off', note=key_id, time=(time.time()-self.time)*1000))
-            print(self.track)
+        self.recorder.add_note(key_id, 0, False)
