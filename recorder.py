@@ -21,7 +21,13 @@ class Recorder:
             self.track.append(mido.Message('note_off', note=note_id, velocity=velocity, time=current_tick))
         
     def save(self):
-        print('Stop recording')
+        print('Save recording')
         cur = datetime.now()
-        name = f'{cur.year}{cur.month:02d}{cur.day:02d}-{cur.hour:02d}{cur.minute:02d}'
+        name = f'{cur.year}{cur.month:02d}{cur.day:02d}-{cur.hour:02d}{cur.minute:02d}{cur.second:02d}'
         self.mid.save(os.path.join('Recordings/'+name+'.mid'))
+    
+    def discard(self):
+        print('Discard recording')
+        self.mid = None
+        self.track = None
+        self.last_time = None
