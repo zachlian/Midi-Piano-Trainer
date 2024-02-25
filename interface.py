@@ -1,12 +1,14 @@
 import pygame
 import mido
 import tkinter as tk
-from display import PianoVisualizer
+from freemode import FreeMode
 from sampler import Sampler
 
 class Mode:
     def start(self):
-        pass
+        pygame.init()
+        pygame.mixer.init() 
+        self.sampler = Sampler(pygame.mixer, False, False)
         
 class FreeMode(Mode):
     def note_handler(self, note: mido.Message) -> None:
@@ -21,10 +23,8 @@ class FreeMode(Mode):
                 self.visualizer.release_key(note_id)
 
     def start(self):
-        pygame.init()
-        pygame.mixer.init() 
-        self.sampler = Sampler(pygame.mixer, False, False)
-        self.visualizer = PianoVisualizer()
+        super().start()
+        self.visualizer = FreeMode()
         print(mido.get_input_names())
         portname = "CHMidi-2.3 0"  # replace with your MIDI INPUT
         
