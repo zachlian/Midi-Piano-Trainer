@@ -1,7 +1,7 @@
 import pygame
 import mido
 import tkinter as tk
-from freemode import FreeMode_display
+from freemode import FreeMode_ball, FreeMode_piano
 from sampler import Sampler
 from pracmode import PracMode_display
 
@@ -17,19 +17,18 @@ class FreeMode():
                 self.sampler.stop(note_id)
                 self.visualizer.release_key(note_id)
 
-    def start(self):
+    def start(self, mode):
         pygame.init()
         pygame.mixer.init() 
         self.sampler = Sampler(pygame.mixer, False, False)
-        self.visualizer = FreeMode_display()
-        print(mido.get_input_names())
-        portname = "CHMidi-2.3 0"  # replace with your MIDI INPUT
-        
+        if mode == 0: # free mode
+            self.visualizer = FreeMode_ball()
+        elif mode == 1: # piano
+            self.visualizer = FreeMode_piano()
+
+        portname = "CHMidi-2.3 0"  # replace with your MIDI INPUT   
         with mido.open_input(portname, callback=self.note_handler) as port:
-            try:
-                self.visualizer.window.mainloop()
-            except KeyboardInterrupt:
-                pass
+            self.visualizer.window.mainloop()
 
 class PracMode(FreeMode):
     def start(self):
@@ -37,26 +36,28 @@ class PracMode(FreeMode):
         pygame.mixer.init() 
         self.sampler = Sampler(pygame.mixer, False, False)
         self.visualizer = PracMode_display('midi_files/test.mid')
-        print(mido.get_input_names())
-        portname = "CHMidi-2.3 0"  # replace with your MIDI INPUT
         
+        portname = "CHMidi-2.3 0"  # replace with your MIDI INPUT
         with mido.open_input(portname, callback=self.note_handler) as port:
-            try:
-                self.visualizer.window.mainloop()
-            except KeyboardInterrupt:
-                pass
+            self.visualizer.window.mainloop()
 
 class MainInterface:
     def __init__(self):
         self.window = tk.Tk()
-        self.button1 = tk.Button(self.window, text="Free Mode", command=self.start_free_mode)
+        self.button1 = tk.Button(self.window, text="FreeMode-Ball", command=self.start_free_mode_ball)
         self.button1.pack()
-        self.button2 = tk.Button(self.window, text="Another Mode", command=self.start_prac_mode)
+        self.button1 = tk.Button(self.window, text="FreeMode-Piano", command=self.start_free_mode_piano)
+        self.button1.pack()
+        self.button2 = tk.Button(self.window, text="PracMode", command=self.start_prac_mode)
         self.button2.pack()
 
-    def start_free_mode(self):
+    def start_free_mode_ball(self):
         self.mode = FreeMode()
-        self.mode.start()
+        self.mode.start(0)
+    
+    def start_free_mode_piano(self):
+        self.mode = FreeMode()
+        self.mode.start(1)
 
     def start_prac_mode(self):
         self.mode = PracMode()
@@ -64,3 +65,7 @@ class MainInterface:
 
     def run(self):
         self.window.mainloop()
+
+if __name__ == "__main__":
+    interface = MainInterface()
+    interface.run()
