@@ -1,7 +1,7 @@
 from pygame import mixer
 
 SAMPLER_POLYPHONY = 32
-
+SOUND_VOLUME = 1.2
 
 class Sampler:
     """
@@ -40,7 +40,7 @@ class Sampler:
         """
         self.sounds[note_id].stop()
         if not self.ignore_velocity:
-            self.sounds[note_id].set_volume(float((vel / 127) * 1.0))
+            self.sounds[note_id].set_volume(float((vel / 127) * SOUND_VOLUME))
         self.sounds[note_id].play()
 
     def stop(self, note_id: int) -> None:

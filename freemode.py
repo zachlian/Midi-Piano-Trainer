@@ -16,7 +16,7 @@ RECORD_KEY = 36
 SAVE_KEY = 38
 DISCARD_KEY = 40
 
-class FreeMode:
+class FreeMode_display:
     def __init__(self):
         self.window = tk.Tk()
         self.canvas = tk.Canvas(self.window, width=WINDOW_W, height=WINDOW_H)
