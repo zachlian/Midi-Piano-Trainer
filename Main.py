@@ -31,11 +31,29 @@ class FreeMode():
             self.visualizer.window.mainloop()
 
 class PracMode(FreeMode):
+    def note_handler(self, note: mido.Message) -> None:
+        # for u to implement
+        if note.type in ["note_on", "note_off"]:
+            note_id = int(note.note)
+            if note.type == "note_on":
+                #self.visualizer.highlight_keys()
+                self.sampler.play(note_id, note.velocity)
+                self.visualizer.press_key(note_id, note.velocity)
+                #self.visualizer.check_press()
+                
+            elif note.type == "note_off":
+                self.sampler.stop(note_id)
+                self.visualizer.release_key(note_id)
+                #self.visualizer.highlight_keys()
+
     def start(self):
         pygame.init()
-        pygame.mixer.init() 
+        pygame.mixer.init()
         self.sampler = Sampler(pygame.mixer, False, False)
-        self.visualizer = PracMode_display('midi_files/test.mid')
+        file_name = "midi_files/test.mid" # replace with your MIDI file
+        self.visualizer = PracMode_display(file_name)
+        
+        self.visualizer.update_time()
         
         portname = "CHMidi-2.3 0"  # replace with your MIDI INPUT
         with mido.open_input(portname, callback=self.note_handler) as port:

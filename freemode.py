@@ -1,12 +1,14 @@
 from tkinter import *
 import tkinter as tk
 from recorder import Recorder
-from drawPiano import draw_piano, WINDOW_H_P, WINDOW_W_P
+from drawPiano import draw_piano, WINDOW_H, WINDOW_W, find_ori_color
 
 KEY_NUM = 61
 RADIUS = 20
 WINDOW_W_B = 1300
 WINDOW_H_B = 200
+WINDOW_W_P = WINDOW_W
+WINDOW_H_P = WINDOW_H
 START_W = (WINDOW_W_B - KEY_NUM*RADIUS)/2
 START_H = 140
 ORIGIN_COLOR = 'white'
@@ -102,7 +104,6 @@ class FreeMode_piano(FreeMode_ori):
         self.canvas = tk.Canvas(self.window, width=WINDOW_W_P, height=WINDOW_H_P)
         self.canvas.pack()
         self.keys = draw_piano(self)
-        self.original_colors = {}
         self.is_recording(False)
     
     def press_key(self, key_id, velocity):
@@ -116,10 +117,9 @@ class FreeMode_piano(FreeMode_ori):
             self.discard()
             return
 
-        self.original_colors[key_id-21] = self.canvas.itemcget(self.keys[key_id-21] , "fill")
         self.canvas.itemconfig(self.keys[key_id-21], fill = PRESSED_COLOR)
         self.recorder.add_note(key_id, velocity, True)
         
     def release_key(self, key_id):
-        self.canvas.itemconfig(self.keys[key_id-21], fill=self.original_colors[key_id-21])
+        self.canvas.itemconfig(self.keys[key_id-21], fill=find_ori_color(key_id))
         self.recorder.add_note(key_id, 0, False)
